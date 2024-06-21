@@ -7,36 +7,6 @@ const cardArray = [];
 // source: https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013
 const placeHolderImgSrc = "./src/placeholder.webp";
 
-function buildCardObject(idNumber, imgSrc, name) {
-  const cardObject = {};
-  cardObject.id = idNumber;
-  if (!imgSrc) {
-    cardObject.imgSrc = placeHolderImgSrc;
-  }
-  if (!name) {
-    cardObject.name = "Loading...";
-  }
-  return cardObject;
-}
-
-function addCardToInitialArray(multiverseId) {
-  const card = buildCardObject(multiverseId);
-  cardArray.push(card);
-}
-
-addCardToInitialArray(82950);
-addCardToInitialArray(443073);
-addCardToInitialArray(25596);
-addCardToInitialArray(13031);
-addCardToInitialArray(13039);
-addCardToInitialArray(11268);
-addCardToInitialArray(26409);
-addCardToInitialArray(23069);
-addCardToInitialArray(11386);
-addCardToInitialArray(210557);
-addCardToInitialArray(13147);
-addCardToInitialArray(598899);
-
 // https://docs.magicthegathering.io
 function getUrlForCard(multiverseId) {
   return `https://api.magicthegathering.io/v1/cards/${multiverseId}`;
@@ -68,7 +38,35 @@ function buildDeck() {
   }
 }
 
-buildDeck();
+function buildCardObject(idNumber, imgSrc, name) {
+  const cardObject = {};
+  cardObject.id = idNumber;
+  if (!imgSrc) {
+    cardObject.imgSrc = placeHolderImgSrc;
+  }
+  if (!name) {
+    cardObject.name = "Loading...";
+  }
+  return cardObject;
+}
+
+function addCardToInitialArray(multiverseId) {
+  const card = buildCardObject(multiverseId);
+  cardArray.push(card);
+}
+
+addCardToInitialArray(82950);
+addCardToInitialArray(443073);
+addCardToInitialArray(25596);
+addCardToInitialArray(13031);
+addCardToInitialArray(13039);
+addCardToInitialArray(11268);
+addCardToInitialArray(26409);
+addCardToInitialArray(23069);
+addCardToInitialArray(11386);
+addCardToInitialArray(210557);
+addCardToInitialArray(13147);
+addCardToInitialArray(598899);
 
 // App title heading as well as footer display
 function Heading() {
@@ -84,6 +82,12 @@ function Footing() {
 }
 
 // Form displays for user to input their name and select a difficulty level
+function UserInfoForm(contentToDisplay, setContentToDisplay) {
+  if (contentToDisplay !== "form") {
+    return;
+  }
+  
+}
 
 // Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
 // https://api.magicthegathering.io/v1/cards/[multiverseId]
@@ -105,6 +109,7 @@ function Footing() {
 // overlay that appears when a round is over
 
 function App() {
+  const [contentToDisplay, setContentToDisplay] = useState("form");
   /*
   // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
   useEffect(() => {
