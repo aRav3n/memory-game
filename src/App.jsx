@@ -2,10 +2,73 @@ import { useState, useEffect } from "react";
 import "./App.css";
 
 // Array of multiverse ID numbers of the 12 cards I want in the deck
-const multiverseIdArray = [
-  82950, 443073, 25596, 13031, 13039, 11268, 26409, 23069, 11386, 210557, 13147,
-  598899,
-];
+const cardArray = [];
+
+// source: https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013
+const placeHolderImgSrc = "./src/placeholder.webp";
+
+function buildCardObject(idNumber, imgSrc, name) {
+  const cardObject = {};
+  cardObject.id = idNumber;
+  if (!imgSrc) {
+    cardObject.imgSrc = placeHolderImgSrc;
+  }
+  if (!name) {
+    cardObject.name = "Loading...";
+  }
+  return cardObject;
+}
+
+function addCardToInitialArray(multiverseId) {
+  const card = buildCardObject(multiverseId);
+  cardArray.push(card);
+}
+
+addCardToInitialArray(82950);
+addCardToInitialArray(443073);
+addCardToInitialArray(25596);
+addCardToInitialArray(13031);
+addCardToInitialArray(13039);
+addCardToInitialArray(11268);
+addCardToInitialArray(26409);
+addCardToInitialArray(23069);
+addCardToInitialArray(11386);
+addCardToInitialArray(210557);
+addCardToInitialArray(13147);
+addCardToInitialArray(598899);
+
+// https://docs.magicthegathering.io
+function getUrlForCard(multiverseId) {
+  return `https://api.magicthegathering.io/v1/cards/${multiverseId}`;
+}
+
+async function buildCardFromApi(multiverseId) {
+  try {
+    const url = getUrlForCard(multiverseId);
+    const response = await fetch(url, { mode: "cors" });
+    const cardJson = await response.json();
+    const builtCard = buildCardObject(
+      multiverseId,
+      await cardJson.card.imageUrl,
+      await cardJson.card.name
+    );
+    // console.log(cardJson.card);
+    console.log(builtCard);
+    return builtCard;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function buildDeck() {
+  for (let i = 0; i < cardArray.length; i++) {
+    const multiverseId = cardArray[i].id;
+    const newCardObject = buildCardFromApi(multiverseId);
+    cardArray[i] = newCardObject;
+  }
+}
+
+buildDeck();
 
 // App title heading as well as footer display
 function Heading() {
@@ -42,9 +105,28 @@ function Footing() {
 // overlay that appears when a round is over
 
 function App() {
-  const [count, setCount] = useState(0);
+  /*
+  // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
+  useEffect(() => {
+    const fetchData = async (multiverseId) => {
+      const result = await fetch(getUrlForCard(multiverseId));
+      console.log(result);
+    };
+    for (let i = 0; i < cardArray.length; i++) {
+      if(cardArray[i].id)
+      const object = fetchData(cardArray[i].id);
+      cardArray[i] = object;
+    }
+  }, []);
+  */
 
-  return <></>;
+  return (
+    <>
+      <Heading />
+
+      <Footing />
+    </>
+  );
 }
 
 export default App;
