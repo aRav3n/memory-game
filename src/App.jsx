@@ -82,11 +82,60 @@ function Footing() {
 }
 
 // Form displays for user to input their name and select a difficulty level
-function UserInfoForm(contentToDisplay, setContentToDisplay) {
+function UserInfoForm({
+  contentToDisplay,
+  setContentToDisplay,
+  playerInfo,
+  setPlayerInfo,
+}) {
   if (contentToDisplay !== "form") {
     return;
   }
-  
+  function buildPlayerObject(name, difficulty) {
+    const playerObject = {};
+    playerObject.name = name;
+    playerObject.difficulty = difficulty;
+    return playerObject;
+  }
+
+  function updatePlayerName(e) {
+    const difficulty = playerInfo.difficulty;
+    const newPlayerObject = buildPlayerObject(e.target.value, difficulty);
+    setPlayerInfo(newPlayerObject);
+    console.log(newPlayerObject);
+  }
+
+  function updatePlayerDifficulty(e) {
+    const name = playerInfo.name;
+    const newPlayerObject = buildPlayerObject(name, e.target.value);
+    setPlayerInfo(newPlayerObject);
+    console.log(newPlayerObject);
+  }
+
+  return (
+    <form>
+      <label htmlFor="name">
+        Player Name:
+        <input type="text" name="name" id="name" onChange={updatePlayerName} />
+      </label>
+      <fieldset onChange={updatePlayerDifficulty}>
+        <legend>Difficulty</legend>
+        <label htmlFor="easy">
+          Easy
+          <input value="easy" type="radio" name="difficulty" id="easy" />
+        </label>
+        <label htmlFor="medium">
+          Medium
+          <input value="medium" type="radio" name="difficulty" id="medium" />
+        </label>
+        <label htmlFor="hard">
+          Hard
+          <input value="hard" type="radio" name="difficulty" id="hard" />
+        </label>
+      </fieldset>
+      <button type="button">Let&apos;s Go!</button>
+    </form>
+  );
 }
 
 // Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
@@ -110,6 +159,8 @@ function UserInfoForm(contentToDisplay, setContentToDisplay) {
 
 function App() {
   const [contentToDisplay, setContentToDisplay] = useState("form");
+  const [deckBuilt, setDeckBuilt] = useState(false);
+  const [playerInfo, setPlayerInfo] = useState("");
   /*
   // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
   useEffect(() => {
@@ -128,7 +179,12 @@ function App() {
   return (
     <>
       <Heading />
-
+      <UserInfoForm
+        contentToDisplay={contentToDisplay}
+        setContentToDisplay={setContentToDisplay}
+        playerInfo={playerInfo}
+        setPlayerInfo={setPlayerInfo}
+      />
       <Footing />
     </>
   );

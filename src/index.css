@@ -34,7 +34,8 @@ body {
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
+  box-sizing: border-box;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
@@ -44,18 +45,52 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border: 2px solid #646cff;
+}
+button:active {
+  background-color: #8f8f8f;
+  border-color: #00000088;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+fieldset {
+  display: flex;
+  gap: 2vw;
+  justify-content: space-evenly;
+}
+
+fieldset > label {
+  background-color: #00000011;
+  border-radius: 0.5rem;
+  display: flex;
+  padding: 1vmin 2vmin;
+}
+
 footer {
   background-color: #00000044;
 }
 
+form {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 20%;
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+  width: max(70vw, 280px);
+}
+
+form * {
+  font-family: Copperplate, Papyrus, fantasy;
+  font-size: min(5vmin, 1.5rem);
+}
+
 h1 {
+  font-family: Copperplate, Papyrus, fantasy;
   font-size: 3.2em;
   line-height: 1.1;
   margin: 1rem auto;
@@ -63,14 +98,29 @@ h1 {
 
 header {
   background-color: #00000022;
+  padding: 0 5vw;
+}
+
+input[type="text"] {
+  border-radius: 0.5rem;
+  font-family: "Brush Script MT", cursive;
+  font-size: min(8vmin, 2rem);
+  padding: 0.25rem 0.5rem;
+}
+
+label {
+  display: grid;
+  gap: 1vmin;
+  justify-content: center;
+  justify-items: start;
 }
 
 #root {
   align-content: space-between;
-  background-color: #9BD3AE;
+  background-color: #9bd3ae;
   display: grid;
   grid-template-columns: 100%;
-  justify-content: space-between;
+  justify-content: stretch;
   margin: 0;
   min-height: 100vh;
   overflow: hidden;
