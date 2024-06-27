@@ -56,6 +56,26 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+#cardGrid {
+  display: grid;
+  gap: 1vmin;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  padding: 1vmin;
+}
+
+#cardGrid button {
+  background-color: #00000022;
+  display: grid;
+  justify-items: center;
+  padding: 1vmin;
+}
+
+#cardGrid img {
+  border-radius: 1.75vmin;
+  object-fit: contain;
+  max-width: 90%;
+}
+
 fieldset {
   display: flex;
   gap: 2vw;

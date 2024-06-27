@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { v4 as uuid } from 'uuid';
 import "./App.css";
 
 // Array of multiverse ID numbers of the 12 cards I want in the deck
@@ -12,35 +13,9 @@ function getUrlForCard(multiverseId) {
   return `https://api.magicthegathering.io/v1/cards/${multiverseId}`;
 }
 
-async function buildCardFromApi(multiverseId) {
-  try {
-    const url = getUrlForCard(multiverseId);
-    const response = await fetch(url, { mode: "cors" });
-    const cardJson = await response.json();
-    const builtCard = buildCardObject(
-      multiverseId,
-      await cardJson.card.imageUrl,
-      await cardJson.card.name
-    );
-    // console.log(cardJson.card);
-    console.log(builtCard);
-    return builtCard;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-function buildDeck() {
-  for (let i = 0; i < cardArray.length; i++) {
-    const multiverseId = cardArray[i].id;
-    const newCardObject = buildCardFromApi(multiverseId);
-    cardArray[i] = newCardObject;
-  }
-}
-
-function buildCardObject(idNumber, imgSrc, name) {
+function buildCardObject(multiverseId, imgSrc, name) {
   const cardObject = {};
-  cardObject.id = idNumber;
+  cardObject.id = multiverseId;
   if (!imgSrc) {
     cardObject.imgSrc = placeHolderImgSrc;
   }
@@ -67,6 +42,32 @@ addCardToInitialArray(11386);
 addCardToInitialArray(210557);
 addCardToInitialArray(13147);
 addCardToInitialArray(598899);
+
+async function buildCardFromApi(multiverseId) {
+  try {
+    const url = getUrlForCard(multiverseId);
+    const response = await fetch(url, { mode: "cors" });
+    const cardJson = await response.json();
+    const builtCard = buildCardObject(
+      multiverseId,
+      await cardJson.card.imageUrl,
+      await cardJson.card.name
+    );
+    // console.log(cardJson.card);
+    console.log(builtCard);
+    return builtCard;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function buildDeckFromApi() {
+  for (let i = 0; i < cardArray.length; i++) {
+    const multiverseId = cardArray[i].id;
+    const newCardObject = buildCardFromApi(multiverseId);
+    cardArray[i] = newCardObject;
+  }
+}
 
 // App title heading as well as footer display
 function Heading() {
@@ -102,14 +103,12 @@ function UserInfoForm({
     const difficulty = playerInfo.difficulty;
     const newPlayerObject = buildPlayerObject(e.target.value, difficulty);
     setPlayerInfo(newPlayerObject);
-    console.log(newPlayerObject);
   }
 
   function updatePlayerDifficulty(e) {
     const name = playerInfo.name;
     const newPlayerObject = buildPlayerObject(name, e.target.value);
     setPlayerInfo(newPlayerObject);
-    console.log(newPlayerObject);
   }
 
   function updateGameState() {
@@ -152,7 +151,41 @@ function UserInfoForm({
   );
 }
 
-function PlayState({ contentToDisplay, setContentToDisplay, playerInfo }) {}
+function PlayState({ contentToDisplay, setContentToDisplay, playerInfo }) {
+  if (contentToDisplay !== "gameplay") {
+    return;
+  }
+  const player = playerInfo.name;
+  const difficulty = playerInfo.difficulty;
+  const difficultyStateArray = cardArray;
+  if (difficulty === "easy") {
+    difficultyStateArray.length = 6;
+  } else if (difficulty === "medium") {
+    difficultyStateArray.length = 9;
+  }
+
+  function DisplayCards() {
+    function buildButton(card) {
+      return (
+        <button key={uuid()} type="button" >
+          <img src={card.imgSrc} alt={card.name} />
+          <p>{card.name}</p>
+        </button>
+      );
+    }
+    const cardsAsButtons = [];
+    for (let i = 0; i < difficultyStateArray.length; i++) {
+      const card = difficultyStateArray[i];
+      const cardHtml = buildButton(card);
+      console.log(cardHtml)
+      cardsAsButtons[i] = cardHtml;
+    }
+
+    return <div id="cardGrid">{cardsAsButtons}</div>;
+  }
+
+  return <DisplayCards />;
+}
 
 // Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
 // https://api.magicthegathering.io/v1/cards/[multiverseId]
