@@ -112,6 +112,18 @@ function UserInfoForm({
     console.log(newPlayerObject);
   }
 
+  function updateGameState() {
+    if (playerInfo.name !== undefined && playerInfo.difficulty !== undefined) {
+      setContentToDisplay("gameplay");
+    } else if (playerInfo.name === undefined) {
+      const nameField = document.querySelector("#name");
+      nameField.classList.add("missing");
+    } else {
+      const difficultyField = document.querySelector("fieldset");
+      difficultyField.classList.add("missing");
+    }
+  }
+
   return (
     <form>
       <label htmlFor="name">
@@ -133,10 +145,14 @@ function UserInfoForm({
           <input value="hard" type="radio" name="difficulty" id="hard" />
         </label>
       </fieldset>
-      <button type="button">Let&apos;s Go!</button>
+      <button type="button" onClick={updateGameState}>
+        Let&apos;s Go!
+      </button>
     </form>
   );
 }
+
+function PlayState({ contentToDisplay, setContentToDisplay, playerInfo }) {}
 
 // Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
 // https://api.magicthegathering.io/v1/cards/[multiverseId]
@@ -184,6 +200,11 @@ function App() {
         setContentToDisplay={setContentToDisplay}
         playerInfo={playerInfo}
         setPlayerInfo={setPlayerInfo}
+      />
+      <PlayState
+        contentToDisplay={contentToDisplay}
+        setContentToDisplay={setContentToDisplay}
+        playerInfo={playerInfo}
       />
       <Footing />
     </>

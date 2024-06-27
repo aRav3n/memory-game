@@ -63,7 +63,8 @@ fieldset {
 }
 
 fieldset > label {
-  background-color: #00000011;
+  background-color: #83a28e44;
+  border: 1px solid #00000022;
   border-radius: 0.5rem;
   display: flex;
   padding: 1vmin 2vmin;
@@ -106,13 +107,20 @@ input[type="text"] {
   font-family: "Brush Script MT", cursive;
   font-size: min(8vmin, 2rem);
   padding: 0.25rem 0.5rem;
+  text-align: center;
 }
 
 label {
   display: grid;
+
   gap: 1vmin;
   justify-content: center;
   justify-items: start;
+}
+
+.missing {
+  background-color: #ff000022;
+  border-color: red;
 }
 
 #root {
