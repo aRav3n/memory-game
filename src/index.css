@@ -58,9 +58,9 @@ button:focus-visible {
 
 #cardGrid {
   display: grid;
-  gap: 1vmin;
+  gap: 2vmin;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  padding: 1vmin;
+  padding: 2vmin;
 }
 
 #cardGrid button {
@@ -71,7 +71,7 @@ button:focus-visible {
 }
 
 #cardGrid img {
-  border-radius: 1.75vmin;
+  border-radius: 15px;
   object-fit: contain;
   max-width: 90%;
 }
@@ -111,8 +111,12 @@ form * {
 }
 
 h1 {
-  font-family: Copperplate, Papyrus, fantasy;
   font-size: 3.2em;
+}
+
+h1,
+h2 {
+  font-family: Copperplate, Papyrus, fantasy;
   line-height: 1.1;
   margin: 1rem auto;
 }

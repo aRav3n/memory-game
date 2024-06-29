@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
 import "./App.css";
 
 // Array of multiverse ID numbers of the 12 cards I want in the deck
@@ -69,6 +69,25 @@ function buildDeckFromApi() {
   }
 }
 
+function shuffleDeck(deckToShuffle, setDeckShuffled) {
+  const shuffledCards = [];
+  shuffledCards.length = deckToShuffle.length;
+
+  function getNewPosition() {
+    let position = Math.floor(Math.random() * shuffledCards.length);
+    if (shuffledCards[position] !== undefined) {
+      position = getNewPosition();
+    }
+    return position;
+  }
+
+  for (let i = 0; i < shuffledCards.length; i++) {
+    shuffledCards[getNewPosition()] = deckToShuffle[i];
+  }
+
+  setDeckShuffled(shuffledCards);
+}
+
 // App title heading as well as footer display
 function Heading() {
   return (
@@ -82,12 +101,26 @@ function Footing() {
   return <footer>&copy; Andy Ryan 2024</footer>;
 }
 
+function updateGameState(newState, playerInfo, setContentToDisplay) {
+  if (playerInfo.name !== undefined && playerInfo.difficulty !== undefined) {
+    setContentToDisplay(newState);
+  } else if (playerInfo.name === undefined) {
+    const nameField = document.querySelector("#name");
+    nameField.classList.add("missing");
+  } else {
+    const difficultyField = document.querySelector("fieldset");
+    difficultyField.classList.add("missing");
+  }
+}
+
 // Form displays for user to input their name and select a difficulty level
 function UserInfoForm({
   contentToDisplay,
   setContentToDisplay,
   playerInfo,
   setPlayerInfo,
+  deck,
+  setDeck,
 }) {
   if (contentToDisplay !== "form") {
     return;
@@ -111,16 +144,36 @@ function UserInfoForm({
     setPlayerInfo(newPlayerObject);
   }
 
-  function updateGameState() {
-    if (playerInfo.name !== undefined && playerInfo.difficulty !== undefined) {
-      setContentToDisplay("gameplay");
-    } else if (playerInfo.name === undefined) {
-      const nameField = document.querySelector("#name");
-      nameField.classList.add("missing");
-    } else {
-      const difficultyField = document.querySelector("fieldset");
-      difficultyField.classList.add("missing");
+  function changeToGameplay() {
+    const difficultyStateArray = cardArray;
+    const difficulty = playerInfo.difficulty;
+    if (difficulty === "easy") {
+      difficultyStateArray.length = 6;
+    } else if (difficulty === "medium") {
+      difficultyStateArray.length = 9;
     }
+    for (let i = 0; i < difficultyStateArray.length; i++) {
+      difficultyStateArray[i].name += ` - ${i}`;
+    }
+
+    function buildButton(card) {
+      return (
+        <button key={uuid()} type="button" onClick={shuffleDeck}>
+          <img src={card.imgSrc} alt={card.name} />
+          <p>{card.name}</p>
+        </button>
+      );
+    }
+
+    const dummyDeck = [];
+    for (let i = 0; i < difficultyStateArray.length; i++) {
+      const card = difficultyStateArray[i];
+      const cardHtml = buildButton(card);
+      dummyDeck[i] = cardHtml;
+    }
+
+    setDeck(dummyDeck);
+    updateGameState("gameplay", playerInfo, setContentToDisplay);
   }
 
   return (
@@ -144,47 +197,34 @@ function UserInfoForm({
           <input value="hard" type="radio" name="difficulty" id="hard" />
         </label>
       </fieldset>
-      <button type="button" onClick={updateGameState}>
+      <button type="button" onClick={changeToGameplay}>
         Let&apos;s Go!
       </button>
     </form>
   );
 }
 
-function PlayState({ contentToDisplay, setContentToDisplay, playerInfo }) {
+function buildHtmlDeck(inputDeck, setDeck) {}
+
+function PlayState({
+  contentToDisplay,
+  setContentToDisplay,
+  deck,
+  setDeck,
+  playerInfo,
+}) {
   if (contentToDisplay !== "gameplay") {
     return;
   }
   const player = playerInfo.name;
   const difficulty = playerInfo.difficulty;
-  const difficultyStateArray = cardArray;
-  if (difficulty === "easy") {
-    difficultyStateArray.length = 6;
-  } else if (difficulty === "medium") {
-    difficultyStateArray.length = 9;
-  }
 
-  function DisplayCards() {
-    function buildButton(card) {
-      return (
-        <button key={uuid()} type="button" >
-          <img src={card.imgSrc} alt={card.name} />
-          <p>{card.name}</p>
-        </button>
-      );
-    }
-    const cardsAsButtons = [];
-    for (let i = 0; i < difficultyStateArray.length; i++) {
-      const card = difficultyStateArray[i];
-      const cardHtml = buildButton(card);
-      console.log(cardHtml)
-      cardsAsButtons[i] = cardHtml;
-    }
-
-    return <div id="cardGrid">{cardsAsButtons}</div>;
-  }
-
-  return <DisplayCards />;
+  return (
+    <>
+    <h2>Good luck {player}!</h2>
+    <div id="cardGrid">{deck}</div>
+    </>
+  );
 }
 
 // Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
@@ -208,8 +248,8 @@ function PlayState({ contentToDisplay, setContentToDisplay, playerInfo }) {
 
 function App() {
   const [contentToDisplay, setContentToDisplay] = useState("form");
-  const [deckBuilt, setDeckBuilt] = useState(false);
   const [playerInfo, setPlayerInfo] = useState("");
+  const [deck, setDeck] = useState("");
   /*
   // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
   useEffect(() => {
@@ -233,10 +273,14 @@ function App() {
         setContentToDisplay={setContentToDisplay}
         playerInfo={playerInfo}
         setPlayerInfo={setPlayerInfo}
+        deck={deck}
+        setDeck={setDeck}
       />
       <PlayState
         contentToDisplay={contentToDisplay}
         setContentToDisplay={setContentToDisplay}
+        deck={deck}
+        setDeck={setDeck}
         playerInfo={playerInfo}
       />
       <Footing />
