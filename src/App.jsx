@@ -30,18 +30,20 @@ function addCardToInitialArray(multiverseId) {
   cardArray.push(card);
 }
 
-addCardToInitialArray(82950);
-addCardToInitialArray(443073);
-addCardToInitialArray(25596);
-addCardToInitialArray(13031);
-addCardToInitialArray(13039);
-addCardToInitialArray(11268);
-addCardToInitialArray(26409);
-addCardToInitialArray(23069);
-addCardToInitialArray(11386);
-addCardToInitialArray(210557);
-addCardToInitialArray(13147);
-addCardToInitialArray(598899);
+function populateInitialDeck() {
+  addCardToInitialArray(82950);
+  addCardToInitialArray(443073);
+  addCardToInitialArray(25596);
+  addCardToInitialArray(13031);
+  addCardToInitialArray(13039);
+  addCardToInitialArray(11268);
+  addCardToInitialArray(26409);
+  addCardToInitialArray(23069);
+  addCardToInitialArray(11386);
+  addCardToInitialArray(210557);
+  addCardToInitialArray(13147);
+  addCardToInitialArray(598899);
+}
 
 async function buildCardFromApi(multiverseId) {
   try {
@@ -125,6 +127,9 @@ function UserInfoForm({
   if (contentToDisplay !== "form") {
     return;
   }
+
+  populateInitialDeck();
+
   function buildPlayerObject(name, difficulty) {
     const playerObject = {};
     playerObject.name = name;
@@ -158,9 +163,9 @@ function UserInfoForm({
 
     function buildButton(card) {
       return (
-        <button key={uuid()} type="button" onClick={shuffleDeck}>
-          <img src={card.imgSrc} alt={card.name} />
-          <p>{card.name}</p>
+        <button key={uuid()} type="button" className="cardButton">
+          <img src={card.imgSrc} alt={card.name} className="cardButton"/>
+          <p className="cardButton">{card.name}</p>
         </button>
       );
     }
@@ -204,8 +209,6 @@ function UserInfoForm({
   );
 }
 
-function buildHtmlDeck(inputDeck, setDeck) {}
-
 function PlayState({
   contentToDisplay,
   setContentToDisplay,
@@ -217,12 +220,20 @@ function PlayState({
     return;
   }
   const player = playerInfo.name;
-  const difficulty = playerInfo.difficulty;
+
+  function shuffleThisDeck(e) {
+    const classOfObject = e.nativeEvent.explicitOriginalTarget.className;
+    if (classOfObject === "cardButton") {
+      shuffleDeck(deck, setDeck);
+    }
+  }
 
   return (
     <>
-    <h2>Good luck {player}!</h2>
-    <div id="cardGrid">{deck}</div>
+      <h2>Good luck {player}!</h2>
+      <div id="cardGrid" onClick={shuffleThisDeck}>
+        {deck}
+      </div>
     </>
   );
 }
