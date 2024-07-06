@@ -294,6 +294,13 @@ function PlayState({
     }
   }
 
+  function startNewGame() {
+    const zeroedScoreObject = buildGameplayObject(gameplay);
+    zeroedScoreObject.currentScore = 0;
+    setGameplay(zeroedScoreObject);
+    setContentToDisplay("form");
+  }
+
   return (
     <>
       <div>
@@ -307,6 +314,9 @@ function PlayState({
       <div id="cardGrid" onClick={shuffleThisDeck}>
         {gameplay.deck}
       </div>
+      <button type="button" onClick={startNewGame} id="newGame">
+        Start new game
+      </button>
     </>
   );
 }

@@ -63,7 +63,8 @@ button:focus-visible {
   padding: 2vmin;
 }
 
-#cardGrid button {
+#cardGrid button,
+#newGame {
   background-color: #00000022;
   display: grid;
   justify-items: center;
@@ -146,6 +147,11 @@ label {
 .missing {
   background-color: #ff000022;
   border-color: red;
+}
+
+#newGame {
+  margin: 2vh auto;
+  padding: 1vmin 2vmin;
 }
 
 #root {
