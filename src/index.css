@@ -115,7 +115,8 @@ h1 {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: Copperplate, Papyrus, fantasy;
   line-height: 1.1;
   margin: 1rem auto;
@@ -158,6 +159,19 @@ label {
   overflow: hidden;
   padding: 0;
   width: 100vw;
+}
+
+.scoreBoard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2vmin;
+  justify-content: space-evenly;
+  margin: 0;
+  padding: 0;
+}
+
+.scoreBoard * {
+  margin: 0;
 }
 
 @media (prefers-color-scheme: light) {

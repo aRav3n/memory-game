@@ -1,6 +1,33 @@
 import { useState, useEffect } from "react";
-import { v4 as uuid } from "uuid";
 import "./App.css";
+
+function buildGameplayObject(objectToClone, deck, clickedCards) {
+  const gameplayObject = {};
+  if (arguments.length === 0) {
+    gameplayObject.deck = [];
+    gameplayObject.currentScore = 0;
+    gameplayObject.highScore = 0;
+    gameplayObject.clickedCards = [];
+  } else {
+    gameplayObject.deck = objectToClone.deck;
+    gameplayObject.currentScore = objectToClone.clickedCards.length;
+    gameplayObject.highScore = objectToClone.highScore;
+    gameplayObject.clickedCards = objectToClone.clickedCards;
+
+    if (deck !== undefined) {
+      gameplayObject.deck = deck;
+    }
+    if (clickedCards !== undefined) {
+      gameplayObject.clickedCards = clickedCards;
+      gameplayObject.currentScore = clickedCards.length;
+    }
+  }
+  if (gameplayObject.currentScore > gameplayObject.highScore) {
+    gameplayObject.highScore = gameplayObject.currentScore;
+  }
+
+  return gameplayObject;
+}
 
 // Array of multiverse ID numbers of the 12 cards I want in the deck
 const cardArray = [];
@@ -71,9 +98,11 @@ function buildDeckFromApi() {
   }
 }
 
-function shuffleDeck(deckToShuffle, setDeckShuffled) {
+function shuffleDeck(gameplay, setGameplay) {
+  const localGameplayObject = buildGameplayObject(gameplay);
+  const deck = localGameplayObject.deck;
   const shuffledCards = [];
-  shuffledCards.length = deckToShuffle.length;
+  shuffledCards.length = deck.length;
 
   function getNewPosition() {
     let position = Math.floor(Math.random() * shuffledCards.length);
@@ -84,10 +113,12 @@ function shuffleDeck(deckToShuffle, setDeckShuffled) {
   }
 
   for (let i = 0; i < shuffledCards.length; i++) {
-    shuffledCards[getNewPosition()] = deckToShuffle[i];
+    shuffledCards[getNewPosition()] = deck[i];
   }
 
-  setDeckShuffled(shuffledCards);
+  localGameplayObject.deck = shuffledCards;
+
+  setGameplay(localGameplayObject);
 }
 
 // App title heading as well as footer display
@@ -121,8 +152,8 @@ function UserInfoForm({
   setContentToDisplay,
   playerInfo,
   setPlayerInfo,
-  deck,
-  setDeck,
+  gameplay,
+  setGameplay,
 }) {
   if (contentToDisplay !== "form") {
     return;
@@ -162,9 +193,40 @@ function UserInfoForm({
     }
 
     function buildButton(card) {
+      function checkIfAlreadyClicked(clickedKey) {
+        const clickedCardArray = [...gameplay.clickedCards];
+        if (clickedCardArray.includes(clickedKey)) {
+          return true;
+        }
+        return false;
+      }
+
+      function updateScore(key) {
+        const localGameplayObject = buildGameplayObject(gameplay);
+        const clickedCardArray = [...gameplay.clickedCards];
+        if (checkIfAlreadyClicked(key)) {
+          localGameplayObject.clickedCards.length = 0;
+        } else {
+          clickedCardArray.push(key);
+          localGameplayObject.clickedCards.push(key);
+        }
+
+        setGameplay(localGameplayObject);
+      }
+
+      function cardClickAction() {
+        const key = card.name;
+        updateScore(key);
+      }
+
       return (
-        <button key={uuid()} type="button" className="cardButton">
-          <img src={card.imgSrc} alt={card.name} className="cardButton"/>
+        <button
+          key={card.name}
+          type="button"
+          className="cardButton"
+          onClick={cardClickAction}
+        >
+          <img src={card.imgSrc} alt={card.name} className="cardButton" />
           <p className="cardButton">{card.name}</p>
         </button>
       );
@@ -173,11 +235,13 @@ function UserInfoForm({
     const dummyDeck = [];
     for (let i = 0; i < difficultyStateArray.length; i++) {
       const card = difficultyStateArray[i];
-      const cardHtml = buildButton(card);
-      dummyDeck[i] = cardHtml;
+      dummyDeck[i] = buildButton(card);
     }
 
-    setDeck(dummyDeck);
+    const localGameplayObject = Object.assign({}, gameplay);
+    localGameplayObject.deck = dummyDeck;
+
+    setGameplay(localGameplayObject);
     updateGameState("gameplay", playerInfo, setContentToDisplay);
   }
 
@@ -212,8 +276,8 @@ function UserInfoForm({
 function PlayState({
   contentToDisplay,
   setContentToDisplay,
-  deck,
-  setDeck,
+  gameplay,
+  setGameplay,
   playerInfo,
 }) {
   if (contentToDisplay !== "gameplay") {
@@ -224,15 +288,22 @@ function PlayState({
   function shuffleThisDeck(e) {
     const classOfObject = e.nativeEvent.explicitOriginalTarget.className;
     if (classOfObject === "cardButton") {
-      shuffleDeck(deck, setDeck);
+      shuffleDeck(gameplay, setGameplay);
     }
   }
 
   return (
     <>
-      <h2>Good luck {player}!</h2>
+      <div>
+        <h2>Good luck {player}!</h2>
+        <h3>Don&apos;t click on the same image twice</h3>
+        <div className="scoreBoard">
+          <p>Current score: {gameplay.currentScore}</p>
+          <p>High score: {gameplay.highScore}</p>
+        </div>
+      </div>
       <div id="cardGrid" onClick={shuffleThisDeck}>
-        {deck}
+        {gameplay.deck}
       </div>
     </>
   );
@@ -258,9 +329,9 @@ function PlayState({
 // overlay that appears when a round is over
 
 function App() {
+  const [gameplay, setGameplay] = useState(buildGameplayObject());
   const [contentToDisplay, setContentToDisplay] = useState("form");
   const [playerInfo, setPlayerInfo] = useState("");
-  const [deck, setDeck] = useState("");
   /*
   // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
   useEffect(() => {
@@ -284,14 +355,14 @@ function App() {
         setContentToDisplay={setContentToDisplay}
         playerInfo={playerInfo}
         setPlayerInfo={setPlayerInfo}
-        deck={deck}
-        setDeck={setDeck}
+        gameplay={gameplay}
+        setGameplay={setGameplay}
       />
       <PlayState
         contentToDisplay={contentToDisplay}
         setContentToDisplay={setContentToDisplay}
-        deck={deck}
-        setDeck={setDeck}
+        gameplay={gameplay}
+        setGameplay={setGameplay}
         playerInfo={playerInfo}
       />
       <Footing />
