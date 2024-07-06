@@ -187,6 +187,8 @@ function UserInfoForm({
       difficultyStateArray.length = 6;
     } else if (difficulty === "medium") {
       difficultyStateArray.length = 9;
+    } else {
+      difficultyStateArray.length = 12;
     }
     for (let i = 0; i < difficultyStateArray.length; i++) {
       difficultyStateArray[i].name += ` - ${i}`;
