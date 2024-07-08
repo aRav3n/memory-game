@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { v4 as uuid } from "uuid";
 import "./App.css";
 
 function buildGameplayObject(objectToClone, deck, clickedCards) {
@@ -27,75 +28,6 @@ function buildGameplayObject(objectToClone, deck, clickedCards) {
   }
 
   return gameplayObject;
-}
-
-// Array of multiverse ID numbers of the 12 cards I want in the deck
-const cardArray = [];
-
-// source: https://static.wikia.nocookie.net/mtgsalvation_gamepedia/images/f/f8/Magic_card_back.jpg/revision/latest?cb=20140813141013
-const placeHolderImgSrc = "./src/placeholder.webp";
-
-// https://docs.magicthegathering.io
-function getUrlForCard(multiverseId) {
-  return `https://api.magicthegathering.io/v1/cards/${multiverseId}`;
-}
-
-function buildCardObject(multiverseId, imgSrc, name) {
-  const cardObject = {};
-  cardObject.id = multiverseId;
-  if (!imgSrc) {
-    cardObject.imgSrc = placeHolderImgSrc;
-  }
-  if (!name) {
-    cardObject.name = "Loading...";
-  }
-  return cardObject;
-}
-
-function addCardToInitialArray(multiverseId) {
-  const card = buildCardObject(multiverseId);
-  cardArray.push(card);
-}
-
-function populateInitialDeck() {
-  addCardToInitialArray(82950);
-  addCardToInitialArray(443073);
-  addCardToInitialArray(25596);
-  addCardToInitialArray(13031);
-  addCardToInitialArray(13039);
-  addCardToInitialArray(11268);
-  addCardToInitialArray(26409);
-  addCardToInitialArray(23069);
-  addCardToInitialArray(11386);
-  addCardToInitialArray(210557);
-  addCardToInitialArray(13147);
-  addCardToInitialArray(598899);
-}
-
-async function buildCardFromApi(multiverseId) {
-  try {
-    const url = getUrlForCard(multiverseId);
-    const response = await fetch(url, { mode: "cors" });
-    const cardJson = await response.json();
-    const builtCard = buildCardObject(
-      multiverseId,
-      await cardJson.card.imageUrl,
-      await cardJson.card.name
-    );
-    // console.log(cardJson.card);
-    console.log(builtCard);
-    return builtCard;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-function buildDeckFromApi() {
-  for (let i = 0; i < cardArray.length; i++) {
-    const multiverseId = cardArray[i].id;
-    const newCardObject = buildCardFromApi(multiverseId);
-    cardArray[i] = newCardObject;
-  }
 }
 
 function shuffleDeck(gameplay, setGameplay) {
@@ -159,8 +91,6 @@ function UserInfoForm({
     return;
   }
 
-  populateInitialDeck();
-
   function buildPlayerObject(name, difficulty) {
     const playerObject = {};
     playerObject.name = name;
@@ -181,69 +111,6 @@ function UserInfoForm({
   }
 
   function changeToGameplay() {
-    const difficultyStateArray = cardArray;
-    const difficulty = playerInfo.difficulty;
-    if (difficulty === "easy") {
-      difficultyStateArray.length = 6;
-    } else if (difficulty === "medium") {
-      difficultyStateArray.length = 9;
-    } else {
-      difficultyStateArray.length = 12;
-    }
-    for (let i = 0; i < difficultyStateArray.length; i++) {
-      difficultyStateArray[i].name += ` - ${i}`;
-    }
-
-    function buildButton(card) {
-      function checkIfAlreadyClicked(clickedKey) {
-        const clickedCardArray = [...gameplay.clickedCards];
-        if (clickedCardArray.includes(clickedKey)) {
-          return true;
-        }
-        return false;
-      }
-
-      function updateScore(key) {
-        const localGameplayObject = buildGameplayObject(gameplay);
-        const clickedCardArray = [...gameplay.clickedCards];
-        if (checkIfAlreadyClicked(key)) {
-          localGameplayObject.clickedCards.length = 0;
-        } else {
-          clickedCardArray.push(key);
-          localGameplayObject.clickedCards.push(key);
-        }
-
-        setGameplay(localGameplayObject);
-      }
-
-      function cardClickAction() {
-        const key = card.name;
-        updateScore(key);
-      }
-
-      return (
-        <button
-          key={card.name}
-          type="button"
-          className="cardButton"
-          onClick={cardClickAction}
-        >
-          <img src={card.imgSrc} alt={card.name} className="cardButton" />
-          <p className="cardButton">{card.name}</p>
-        </button>
-      );
-    }
-
-    const dummyDeck = [];
-    for (let i = 0; i < difficultyStateArray.length; i++) {
-      const card = difficultyStateArray[i];
-      dummyDeck[i] = buildButton(card);
-    }
-
-    const localGameplayObject = Object.assign({}, gameplay);
-    localGameplayObject.deck = dummyDeck;
-
-    setGameplay(localGameplayObject);
     updateGameState("gameplay", playerInfo, setContentToDisplay);
   }
 
@@ -305,7 +172,13 @@ function PlayState({
     <>
       <div>
         <h2>Good luck {player}!</h2>
-        <h3>Don&apos;t click on the same image twice</h3>
+        <h3>
+          Pick a card! (If the cards haven&apos;t loaded yet, just be patient)
+        </h3>
+        <h3>
+          You win by selecting all the cards! (be sure not to click on the same
+          image twice)
+        </h3>
         <div className="scoreBoard">
           <p>Current score: {gameplay.currentScore}</p>
           <p>High score: {gameplay.highScore}</p>
@@ -321,43 +194,128 @@ function PlayState({
   );
 }
 
-// Pull X number of images from an API with useEffect where X is determined by selected difficulty level. X = [6 (easy), 9 (medium), or 12 (hard)] cards.
-// https://api.magicthegathering.io/v1/cards/[multiverseId]
-
-// Reusable function placeCardsAtRandom() to place images at random spots in an array
-
-// Brief description of how to play appears on screen. Remember to have a highly visible X button to close it.
-
-// RAM css grid appears displaying all cards placed in random positions via placeCardsAtRandom(). Cards are all button elements
-
-// h2 displaying both current score and best score
-
-// When user clicks a card it gets added to an array of clicked cards via useState()
-
-// Click also triggers another placeCardsAtRandom(). If successful then current score = current score++
-
-// Round ends when user has selected all cards and wins or accidentally selects a card twice and loses. Either way the top score will go into the h2 that displays best score
-
-// overlay that appears when a round is over
+function ResultState({ playerInfo, contentToDisplay }) {
+  if (contentToDisplay !== "victory") {
+    return;
+  }
+  const victoryMessage = `${playerInfo.name} won on ${playerInfo.difficulty} mode!`;
+  return (
+    <>
+      <h4>{victoryMessage}</h4>
+    </>
+  );
+}
 
 function App() {
   const [gameplay, setGameplay] = useState(buildGameplayObject());
   const [contentToDisplay, setContentToDisplay] = useState("form");
   const [playerInfo, setPlayerInfo] = useState("");
-  /*
-  // followed tutorial by Ghost Together: https://www.youtube.com/watch?v=ZRFwuGpiLl4
-  useEffect(() => {
-    const fetchData = async (multiverseId) => {
-      const result = await fetch(getUrlForCard(multiverseId));
-      console.log(result);
-    };
-    for (let i = 0; i < cardArray.length; i++) {
-      if(cardArray[i].id)
-      const object = fetchData(cardArray[i].id);
-      cardArray[i] = object;
+
+  function buildButton(cardObject) {
+    const name = cardObject.name;
+    const imgSrc = cardObject.imgSrc;
+    const key = uuid();
+    function checkIfAlreadyClicked(clickedKey) {
+      const clickedCardArray = [...gameplay.clickedCards];
+      if (clickedCardArray.includes(clickedKey)) {
+        return true;
+      }
+      return false;
     }
-  }, []);
-  */
+
+    function updateScore(key) {
+      const localGameplayObject = buildGameplayObject(gameplay);
+      const clickedCardArray = [...gameplay.clickedCards];
+      if (checkIfAlreadyClicked(key)) {
+        localGameplayObject.clickedCards.length = 0;
+      } else {
+        clickedCardArray.push(key);
+        localGameplayObject.clickedCards.push(key);
+      }
+
+      setGameplay(localGameplayObject);
+    }
+
+    function cardClickAction() {
+      const key = name;
+      updateScore(key);
+    }
+
+    return (
+      <button
+        key={key}
+        type="button"
+        className="cardButton"
+        onClick={cardClickAction}
+      >
+        <img src={imgSrc} alt={name} className="cardButton" />
+        <p className="cardButton">{name}</p>
+      </button>
+    );
+  }
+
+  useEffect(() => {
+    const difficulty = playerInfo.difficulty;
+    async function parseJson(jsonObject) {
+      try {
+        const returnObject = {};
+        returnObject.name = jsonObject.name;
+        returnObject.imgSrc = jsonObject.image_uris.normal;
+        return returnObject;
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    async function getData() {
+      const url = "https://api.scryfall.com/cards/random";
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+        }
+
+        const json = await response.json();
+        const card = await parseJson(json);
+        return card;
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
+
+    async function buildDeck() {
+      try {
+        const deck = [];
+        let numberOfCards = 0;
+        if (difficulty === "easy") {
+          numberOfCards = 6;
+        } else if (difficulty === "medium") {
+          numberOfCards = 9;
+        } else {
+          numberOfCards = 12;
+        }
+        deck.length = numberOfCards;
+
+        for (let i = 0; i < deck.length; i++) {
+          const cardObject = await getData();
+          deck[i] = buildButton(cardObject);
+        }
+
+        return deck;
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    async function updateGameplay() {
+      const deck = await buildDeck();
+      const newGameplayObject = buildGameplayObject(gameplay, deck);
+      setGameplay(newGameplayObject);
+    }
+    if (difficulty !== undefined) {
+      updateGameplay();
+    }
+  }, [playerInfo.difficulty]);
 
   return (
     <>
@@ -376,6 +334,10 @@ function App() {
         gameplay={gameplay}
         setGameplay={setGameplay}
         playerInfo={playerInfo}
+      />
+      <ResultState
+        playerInfo={playerInfo}
+        contentToDisplay={contentToDisplay}
       />
       <Footing />
     </>
