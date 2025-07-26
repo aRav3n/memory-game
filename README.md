@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Description](#description)
+- [Installation Instructions](#installation-instructions)
 - [Usage and Screenshots](#usage-and-screenshots)
 - [Technologies Used](#technologies-used)
 - [Dependencies and Credits](#dependencies-and-credits)
@@ -11,6 +12,22 @@
 ## Description
 
 This is a memory card game using the Scryfall API for the backend and Vite and React to build the frontend.
+
+## Installation Instructions
+
+1. Clone or fork this repo
+2. cd into the project root directory (where the README.md file is located)
+3. Run the following in your terminal
+    - ``` bash
+      npm init -y
+      npm install react react-dom uuid
+      npm install @types/react @types/react-dom @vitejs/plugin-react --save-dev
+      npm install eslint eslint-config-prettier eslint-plugin-react --save-dev
+      npm install eslint-plugin-react-hooks eslint-plugin-react-refresh vite --save-dev
+      ```
+1. `npm run dev`
+   - `^` + `c` will end the process 
+1. Navigate to the url displayed in the terminal: `➜  Local:   http://localhost:5173/` 
 
 ## Usage and Screenshots
 
@@ -75,7 +92,7 @@ After that the cards will be loaded (sometimes takes a bit) then the player begi
 ```bash
 
 ├──src/                   # Source files are located here
-    ├── assets/           # Static images are located here
-├──tests/                 # Test files are located here
+    └── assets/           # Static images are located here
+└──tests/                 # Test files are located here
 
 ```
