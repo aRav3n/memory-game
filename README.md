@@ -31,7 +31,7 @@ This is a memory card game using the Scryfall API for the backend and Vite and R
 
 ## Usage and Screenshots
 
-<img src="./src/assets/screenshot.png" alt="screenshot" style="height: 50vh; width: auto;">
+<img src="./public/screenshot.png" alt="screenshot" style="height: 50vh; width: auto;">
 
 The player first enters their name, then selects an difficulty, then clicks "Let's Go!"
 
