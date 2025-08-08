@@ -20,10 +20,7 @@ This is a memory card game using the Scryfall API for the backend and Vite and R
 3. Run the following in your terminal
     - ``` bash
       npm init -y
-      npm install react react-dom uuid
-      npm install @types/react @types/react-dom @vitejs/plugin-react --save-dev
-      npm install eslint eslint-config-prettier eslint-plugin-react --save-dev
-      npm install eslint-plugin-react-hooks eslint-plugin-react-refresh vite --save-dev
+      npm install
       ```
 1. `npm run dev`
    - `^` + `c` will end the process 
